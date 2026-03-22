@@ -43,9 +43,11 @@ router.post("/register", async (req: Request, res: Response) => {
     .values({ email: email.toLowerCase(), fullName, hashedPassword })
     .returning();
 
-  const token = jwt.sign({ userId: user.id }, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
+  const token = jwt.sign(
+  { userId: user.id },
+  String(config.jwtSecret),
+  { expiresIn: config.jwtExpiresIn }
+);
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -86,7 +88,7 @@ router.post("/login", async (req: Request, res: Response) => {
     return;
   }
 
-  const token = jwt.sign({ userId: user.id }, config.jwtSecret, {
+ const token = jwt.sign({ userId: user.id }, String(config.jwtSecret) as any, {
     expiresIn: config.jwtExpiresIn,
   });
 
