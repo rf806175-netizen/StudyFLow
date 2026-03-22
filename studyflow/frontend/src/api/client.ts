@@ -1,4 +1,4 @@
-const BASE_URL = "/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "https://studyflow-backend-one.vercel.app/api";
 
 type RequestOptions = RequestInit & { json?: unknown };
 
