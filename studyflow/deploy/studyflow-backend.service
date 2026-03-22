@@ -1,0 +1,25 @@
+[Unit]
+Description=StudyFlow Backend (Express.js API)
+After=network.target
+
+[Service]
+Type=simple
+User=studyflow
+Group=studyflow
+WorkingDirectory=/home/studyflow/app/backend
+EnvironmentFile=/home/studyflow/app/.env
+ExecStart=/usr/bin/node dist/index.js
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=studyflow
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/home/studyflow/app
+
+[Install]
+WantedBy=multi-user.target
