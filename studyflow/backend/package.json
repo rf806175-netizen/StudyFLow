@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "chmod +x ./node_modules/.bin/tsc && ./node_modules/.bin/tsc",
+    "build": "npx tsc",
     "start": "node dist/index.js",
     "migrate": "drizzle-kit migrate",
     "generate": "drizzle-kit generate",
