@@ -1,14 +1,14 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { pgTable, text, serial, integer, real, boolean } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   fullName: text("full_name").notNull(),
   hashedPassword: text("hashed_password").notNull(),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   subscriptionTier: text("subscription_tier", { enum: ["free", "premium"] })
     .notNull()
     .default("free"),
@@ -17,16 +17,16 @@ export const users = sqliteTable("users", {
   subscriptionExpiresAt: text("subscription_expires_at"), // ISO 8601
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
   updatedAt: text("updated_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
 });
 
 // ─── Subjects ─────────────────────────────────────────────────────────────────
 
-export const subjects = sqliteTable("subjects", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const subjects = pgTable("subjects", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -38,16 +38,16 @@ export const subjects = sqliteTable("subjects", {
     .default("medium"),
   examDate: text("exam_date"), // ISO 8601
   weeklyGoalHours: real("weekly_goal_hours").notNull().default(2.0),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
 });
 
 // ─── Study Sessions ───────────────────────────────────────────────────────────
 
-export const studySessions = sqliteTable("study_sessions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const studySessions = pgTable("study_sessions", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -75,13 +75,13 @@ export const studySessions = sqliteTable("study_sessions", {
   focusScore: integer("focus_score"), // 1-5
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
 });
 
 // ─── Schedules ────────────────────────────────────────────────────────────────
 
-export const schedules = sqliteTable("schedules", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const schedules = pgTable("schedules", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -96,16 +96,16 @@ export const schedules = sqliteTable("schedules", {
   recurrence: text("recurrence", { enum: ["once", "weekly", "daily"] })
     .notNull()
     .default("weekly"),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
 });
 
 // ─── Payments ─────────────────────────────────────────────────────────────────
 
-export const payments = sqliteTable("payments", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -121,13 +121,13 @@ export const payments = sqliteTable("payments", {
   description: text("description").notNull(),
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
 });
 
 // ─── Tutoring Requests ────────────────────────────────────────────────────────
 
-export const tutoringRequests = sqliteTable("tutoring_requests", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const tutoringRequests = pgTable("tutoring_requests", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -143,7 +143,7 @@ export const tutoringRequests = sqliteTable("tutoring_requests", {
     .default("pending"),
   createdAt: text("created_at")
     .notNull()
-    .default(sql`(datetime('now'))`),
+    .default(sql`now()`),
 });
 
 // ─── Types ────────────────────────────────────────────────────────────────────

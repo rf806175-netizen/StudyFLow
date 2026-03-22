@@ -4,7 +4,7 @@ import { config } from "./config";
 
 async function main() {
   // Run database migrations on startup
-  runMigrations();
+  await runMigrations();
 
   const app = createApp();
 
