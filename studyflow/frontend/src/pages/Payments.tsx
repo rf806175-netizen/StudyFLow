@@ -39,11 +39,13 @@ export default function PaymentsPage() {
   const checkoutMutation = useMutation({
     mutationFn: (priceId: string) => paymentsApi.createCheckout(priceId),
     onSuccess: ({ url }) => { window.location.href = url; },
+    onError: (err: any) => { alert("Erro ao iniciar pagamento: " + (err?.message || "Tente novamente")); },
   });
 
   const portalMutation = useMutation({
     mutationFn: paymentsApi.createPortal,
     onSuccess: ({ url }) => { window.location.href = url; },
+    onError: (err: any) => { alert("Erro ao abrir portal: " + (err?.message || "Tente novamente")); },
   });
 
   if (!user) {
