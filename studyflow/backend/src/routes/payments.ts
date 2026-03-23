@@ -94,12 +94,12 @@ router.get("/prices", (_req: Request, res: Response) => {
   res.json({
     monthly: {
       priceId: config.stripe.premiumMonthlyPriceId,
-      amount: 599, // $5.99 in cents
+      amount: 2500, // R$25,00 em centavos
       interval: "month",
     },
     yearly: {
       priceId: config.stripe.premiumYearlyPriceId,
-      amount: 4999, // $49.99 in cents
+      amount: 25000, // R$250,00 em centavos
       interval: "year",
     },
   });
