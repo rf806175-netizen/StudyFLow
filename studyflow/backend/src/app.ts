@@ -19,10 +19,17 @@ export function createApp() {
   // Security headers
   app.use(helmet());
 
-  // CORS — only allow frontend origin
+  // CORS — allow frontend origin and Vercel preview deployments
   app.use(
     cors({
-      origin: config.frontendUrl,
+      origin: (origin, callback) => {
+        const allowed = [config.frontendUrl, "http://localhost:5173"];
+        if (!origin || allowed.includes(origin) || origin.endsWith(".vercel.app")) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
     })
   );

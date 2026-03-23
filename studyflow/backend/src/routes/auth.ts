@@ -51,8 +51,8 @@ router.post("/register", async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: config.nodeEnv === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: config.cookieMaxAge,
   });
 
@@ -96,8 +96,8 @@ router.post("/login", async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: config.nodeEnv === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: config.cookieMaxAge,
   });
 
