@@ -17,6 +17,7 @@ export function useAuth() {
     },
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!user, // só roda se o usuário já estiver logado
   });
 
   const loginMutation = useMutation({
