@@ -43,8 +43,8 @@ export async function createCheckoutSession(
     payment_method_types: ["card"],
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${config.frontendUrl}/payments?success=true&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${config.frontendUrl}/payments?cancelled=true`,
+    success_url: `${config.frontendUrl}/pagamentos?success=true&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${config.frontendUrl}/pagamentos?cancelled=true`,
     metadata: { userId: String(userId) },
     allow_promotion_codes: true,
   });
@@ -56,7 +56,7 @@ export async function createCheckoutSession(
 export async function createPortalSession(customerId: string): Promise<string> {
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
-    return_url: `${config.frontendUrl}/payments`,
+    return_url: `${config.frontendUrl}/pagamentos`,
   });
   return session.url;
 }
