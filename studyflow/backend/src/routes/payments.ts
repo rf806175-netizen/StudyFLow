@@ -72,7 +72,8 @@ router.post("/checkout", async (req: AuthRequest, res: Response) => {
     req.userId!,
     req.user!.email,
     req.user!.fullName,
-    result.data.priceId
+    result.data.priceId,
+    req.user!.stripeCustomerId ?? undefined
   );
 
   res.json({ url });

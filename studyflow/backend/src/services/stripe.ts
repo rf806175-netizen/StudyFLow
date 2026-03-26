@@ -10,14 +10,11 @@ export { stripe };
 export async function createOrGetCustomer(
   userId: number,
   email: string,
-  name: string
+  name: string,
+  existingCustomerId?: string
 ): Promise<string> {
-  const user = await db.query.users.findFirst({
-    where: eq(schema.users.id, userId),
-  });
-
-  if (user?.stripeCustomerId) {
-    return user.stripeCustomerId;
+  if (existingCustomerId) {
+    return existingCustomerId;
   }
 
   const customer = await stripe.customers.create({ email, name });
@@ -34,9 +31,10 @@ export async function createCheckoutSession(
   userId: number,
   email: string,
   name: string,
-  priceId: string
+  priceId: string,
+  existingCustomerId?: string
 ): Promise<string> {
-  const customerId = await createOrGetCustomer(userId, email, name);
+  const customerId = await createOrGetCustomer(userId, email, name, existingCustomerId);
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
