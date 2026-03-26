@@ -2,14 +2,27 @@ const BASE_URL = import.meta.env.VITE_API_URL || "https://studyflow-backend-one.
 
 type RequestOptions = RequestInit & { json?: unknown };
 
+function getToken(): string | null {
+  try {
+    const stored = localStorage.getItem("studyflow-auth");
+    if (!stored) return null;
+    const parsed = JSON.parse(stored);
+    return parsed?.state?.token ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { json, ...init } = options;
+  const token = getToken();
 
   const response = await fetch(`${BASE_URL}${path}`, {
     ...init,
-    credentials: "include", // send httpOnly cookie automatically
+    credentials: "include",
     headers: {
       ...(json ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
       ...init.headers,
     },
     body: json ? JSON.stringify(json) : init.body,
@@ -44,6 +57,7 @@ export type User = {
   fullName: string;
   subscriptionTier: "free" | "premium";
   subscriptionExpiresAt: string | null;
+  token?: string;
 };
 
 export const authApi = {

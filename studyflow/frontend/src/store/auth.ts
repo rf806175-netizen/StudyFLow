@@ -9,9 +9,11 @@ interface FreeActions {
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   guestMode: boolean;
   freeActions: FreeActions;
   setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
   setGuestMode: (v: boolean) => void;
   consumeFreeAction: (action: keyof FreeActions) => boolean;
   isPremium: () => boolean;
@@ -21,9 +23,11 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      token: null,
       guestMode: false,
       freeActions: { organize: 0, search: 0 },
       setUser: (user) => set({ user }),
+      setToken: (token) => set({ token }),
       setGuestMode: (v) => set({ guestMode: v }),
       consumeFreeAction: (action) => {
         const { freeActions } = get();
@@ -46,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
       name: "studyflow-auth",
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
         freeActions: state.freeActions,
       }),
     }

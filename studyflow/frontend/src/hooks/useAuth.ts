@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/auth";
 import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, setToken } = useAuthStore();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -23,6 +23,7 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
+      if (data.token) setToken(data.token);
       setUser(data);
       queryClient.setQueryData(["auth", "me"], data);
       navigate("/dashboard");
@@ -32,6 +33,7 @@ export function useAuth() {
   const registerMutation = useMutation({
     mutationFn: authApi.register,
     onSuccess: (data) => {
+      if (data.token) setToken(data.token);
       setUser(data);
       queryClient.setQueryData(["auth", "me"], data);
       navigate("/dashboard");
@@ -41,6 +43,7 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
+      setToken(null);
       setUser(null);
       queryClient.clear();
       navigate("/login");

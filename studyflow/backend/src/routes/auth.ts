@@ -61,6 +61,7 @@ router.post("/register", async (req: Request, res: Response) => {
     email: user.email,
     fullName: user.fullName,
     subscriptionTier: user.subscriptionTier,
+    token,
   });
 });
 
@@ -106,6 +107,7 @@ router.post("/login", async (req: Request, res: Response) => {
     email: user.email,
     fullName: user.fullName,
     subscriptionTier: user.subscriptionTier,
+    token,
   });
 });
 
