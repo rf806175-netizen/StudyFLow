@@ -57,37 +57,47 @@ const checkoutSchema = z.object({
 
 // POST /api/payments/checkout
 router.post("/checkout", async (req: AuthRequest, res: Response) => {
-  const result = checkoutSchema.safeParse(req.body);
-  if (!result.success) {
-    res.status(400).json({ error: "Invalid price ID" });
-    return;
+  try {
+    const result = checkoutSchema.safeParse(req.body);
+    if (!result.success) {
+      res.status(400).json({ error: "Invalid price ID" });
+      return;
+    }
+
+    if (req.user!.subscriptionTier === "premium") {
+      res.status(409).json({ error: "Already subscribed to Premium" });
+      return;
+    }
+
+    const url = await createCheckoutSession(
+      req.userId!,
+      req.user!.email,
+      req.user!.fullName,
+      result.data.priceId,
+      req.user!.stripeCustomerId ?? undefined
+    );
+
+    res.json({ url });
+  } catch (err: any) {
+    console.error("Checkout error:", err?.message || err);
+    res.status(500).json({ error: err?.message || "Failed to create checkout session" });
   }
-
-  if (req.user!.subscriptionTier === "premium") {
-    res.status(409).json({ error: "Already subscribed to Premium" });
-    return;
-  }
-
-  const url = await createCheckoutSession(
-    req.userId!,
-    req.user!.email,
-    req.user!.fullName,
-    result.data.priceId,
-    req.user!.stripeCustomerId ?? undefined
-  );
-
-  res.json({ url });
 });
 
 // POST /api/payments/portal
 router.post("/portal", async (req: AuthRequest, res: Response) => {
-  if (!req.user!.stripeCustomerId) {
-    res.status(404).json({ error: "No Stripe customer found" });
-    return;
-  }
+  try {
+    if (!req.user!.stripeCustomerId) {
+      res.status(404).json({ error: "No Stripe customer found" });
+      return;
+    }
 
-  const url = await createPortalSession(req.user!.stripeCustomerId);
-  res.json({ url });
+    const url = await createPortalSession(req.user!.stripeCustomerId);
+    res.json({ url });
+  } catch (err: any) {
+    console.error("Portal error:", err?.message || err);
+    res.status(500).json({ error: err?.message || "Failed to create portal session" });
+  }
 });
 
 // GET /api/payments/prices
