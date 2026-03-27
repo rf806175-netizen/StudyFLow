@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../store/auth";
 import { useNavigate } from "react-router-dom";
+import PricingModal from "../components/PricingModal";
+import { useCheckout } from "../hooks/useCheckout";
 
 const UNIVERSITY_SUBJECTS = [
   "Cálculo I", "Cálculo II", "Álgebra Linear", "Física I", "Física II",
@@ -34,8 +36,13 @@ interface Slide {
 }
 
 export default function TCCPage() {
-  const { user } = useAuthStore();
+  const { user, isPremium } = useAuthStore();
   const navigate = useNavigate();
+  const { isPending: checkoutPending } = useCheckout();
+  const [showPricing, setShowPricing] = useState(false);
+  const isPremiumUser = isPremium?.() ?? false;
+  const freeUploadKey = `tcc_upload_used_${user?.id}`;
+  const hasUsedFreeUpload = !!localStorage.getItem(freeUploadKey);
 
   const [subject, setSubject] = useState(UNIVERSITY_SUBJECTS[0]);
   const [title, setTitle] = useState("");
@@ -81,12 +88,20 @@ export default function TCCPage() {
   };
 
   const handleFileUpload = (id: string, file: File) => {
+    if (!isPremiumUser && hasUsedFreeUpload) {
+      setShowPricing(true);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       const fileUrl = e.target?.result as string;
       setSlides((prev) =>
         prev.map((s) => (s.id === id ? { ...s, fileName: file.name, fileUrl } : s))
       );
+      // Marca tentativa grátis usada
+      if (!isPremiumUser) {
+        localStorage.setItem(freeUploadKey, "1");
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -388,21 +403,30 @@ export default function TCCPage() {
                           </button>
                         </div>
                       ) : (
-                        <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 cursor-pointer transition-colors px-3 py-1.5 rounded-lg">
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                          </svg>
-                          📎 Anexar arquivo
-                          <input
-                            type="file"
-                            accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx,.doc,.docx"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleFileUpload(slide.id, file);
-                            }}
-                          />
-                        </label>
+                        {!isPremiumUser && hasUsedFreeUpload ? (
+                          <button
+                            onClick={() => setShowPricing(true)}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 cursor-pointer transition-colors px-3 py-1.5 rounded-lg"
+                          >
+                            📎 Anexar arquivo <span className="bg-white/20 rounded px-1">Premium</span>
+                          </button>
+                        ) : (
+                          <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 cursor-pointer transition-colors px-3 py-1.5 rounded-lg">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                            📎 Anexar arquivo {!isPremiumUser && <span className="bg-white/20 rounded px-1 text-[10px]">1 grátis</span>}
+                            <input
+                              type="file"
+                              accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx,.doc,.docx"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(slide.id, file);
+                              }}
+                            />
+                          </label>
+                        )}
                       )}
                     </div>
                   </div>
@@ -464,6 +488,13 @@ export default function TCCPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {showPricing && (
+        <PricingModal
+          onClose={() => setShowPricing(false)}
+          feature="Anexar arquivos no TCC"
+        />
       )}
     </div>
   );
