@@ -403,7 +403,7 @@ export default function TCCPage() {
                           </button>
                         </div>
                       ) : (
-                        {!isPremiumUser && hasUsedFreeUpload ? (
+                        {(!isPremiumUser && hasUsedFreeUpload) ? (
                           <button
                             onClick={() => setShowPricing(true)}
                             className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 cursor-pointer transition-colors px-3 py-1.5 rounded-lg"
