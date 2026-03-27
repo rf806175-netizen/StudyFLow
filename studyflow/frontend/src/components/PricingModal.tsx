@@ -1,9 +1,13 @@
+import { useCheckout } from "../hooks/useCheckout";
+
 interface PricingModalProps {
   onClose: () => void;
   feature?: string;
 }
 
 export default function PricingModal({ onClose, feature }: PricingModalProps) {
+  const { checkoutMonthly, checkoutYearly, isPending } = useCheckout();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -42,23 +46,19 @@ export default function PricingModal({ onClose, feature }: PricingModalProps) {
                 </div>
               </div>
               <ul className="space-y-2 text-sm text-gray-700 mb-4">
-                <li className="flex items-center gap-2">
-                  <span className="text-primary-600">✓</span> Organização ilimitada
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary-600">✓</span> Pesquisa Wikipedia ilimitada
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary-600">✓</span> Upload de materiais
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary-600">✓</span> Relatórios de progresso
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-primary-600">✓</span> 1 usuário
-                </li>
+                <li className="flex items-center gap-2"><span className="text-primary-600">✓</span> Organização ilimitada</li>
+                <li className="flex items-center gap-2"><span className="text-primary-600">✓</span> Pesquisa Wikipedia ilimitada</li>
+                <li className="flex items-center gap-2"><span className="text-primary-600">✓</span> Upload de materiais</li>
+                <li className="flex items-center gap-2"><span className="text-primary-600">✓</span> Relatórios de progresso</li>
+                <li className="flex items-center gap-2"><span className="text-primary-600">✓</span> 1 usuário</li>
               </ul>
-              <button className="btn-primary w-full">Assinar Mensal</button>
+              <button
+                onClick={checkoutMonthly}
+                disabled={isPending}
+                className="btn-primary w-full disabled:opacity-60"
+              >
+                {isPending ? "Redirecionando..." : "Assinar Mensal"}
+              </button>
             </div>
 
             {/* Anual */}
@@ -75,24 +75,18 @@ export default function PricingModal({ onClose, feature }: PricingModalProps) {
                 <div className="text-xs text-green-600 font-semibold mt-1">Economize 87% vs mensal</div>
               </div>
               <ul className="space-y-2 text-sm text-gray-700 mb-4">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Tudo do plano Mensal
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> 12 meses de acesso
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Relatórios completos
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Novidades antecipadas
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Suporte prioritário
-                </li>
+                <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Tudo do plano Mensal</li>
+                <li className="flex items-center gap-2"><span className="text-green-500">✓</span> 12 meses de acesso</li>
+                <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Relatórios completos</li>
+                <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Novidades antecipadas</li>
+                <li className="flex items-center gap-2"><span className="text-green-500">✓</span> Suporte prioritário</li>
               </ul>
-              <button className="btn-primary w-full">
-                Assinar Anual
+              <button
+                onClick={checkoutYearly}
+                disabled={isPending}
+                className="btn-primary w-full disabled:opacity-60"
+              >
+                {isPending ? "Redirecionando..." : "Assinar Anual"}
               </button>
             </div>
           </div>

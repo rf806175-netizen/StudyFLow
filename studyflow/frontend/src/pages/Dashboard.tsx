@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { subjectsApi, sessionsApi } from "../api/client";
 import { useAuthStore } from "../store/auth";
 import { useNavigate } from "react-router-dom";
+import { useCheckout } from "../hooks/useCheckout";
 
 const WEEK_DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const isPremium = user?.subscriptionTier === "premium";
+  const { checkoutMonthly, checkoutYearly, isPending } = useCheckout();
 
   const { data: subjects = [] } = useQuery({
     queryKey: ["subjects"],
@@ -173,12 +175,19 @@ export default function Dashboard() {
               <p className="text-white font-extrabold text-2xl leading-none">R$ 25<span className="text-sm font-medium text-blue-300">/mês</span></p>
             </div>
             <button
-              onClick={() => navigate("/perfil")}
-              className="bg-white text-primary-700 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-colors shadow-lg whitespace-nowrap"
+              onClick={checkoutMonthly}
+              disabled={isPending}
+              className="bg-white text-primary-700 font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-colors shadow-lg whitespace-nowrap disabled:opacity-60"
             >
-              Assinar Premium
+              {isPending ? "Redirecionando..." : "Assinar R$ 25/mês"}
             </button>
-            <p className="text-blue-300/60 text-[10px]">ou R$ 250/ano — economize 17%</p>
+            <button
+              onClick={checkoutYearly}
+              disabled={isPending}
+              className="text-blue-300 text-[10px] underline hover:text-white transition-colors disabled:opacity-60"
+            >
+              ou R$ 250/ano — economize 87%
+            </button>
           </div>
         </div>
       )}

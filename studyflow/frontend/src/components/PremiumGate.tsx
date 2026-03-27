@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
+import { useCheckout } from "../hooks/useCheckout";
 
 interface PremiumGateProps {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ interface PremiumGateProps {
 
 export default function PremiumGate({ children, feature }: PremiumGateProps) {
   const { isPremium } = useAuthStore();
-  const navigate = useNavigate();
+  const { checkoutMonthly, checkoutYearly, isPending } = useCheckout();
 
   if (isPremium()) {
     return <>{children}</>;
@@ -26,12 +26,22 @@ export default function PremiumGate({ children, feature }: PremiumGateProps) {
           : "Este recurso está disponível apenas no plano Premium."}
         {" "}Faça upgrade para desbloquear relatórios, tutorias e muito mais.
       </p>
-      <button
-        onClick={() => navigate("/payments")}
-        className="btn-primary text-base px-6 py-3"
-      >
-        Ver planos Premium
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={checkoutMonthly}
+          disabled={isPending}
+          className="btn-primary text-base px-6 py-3 disabled:opacity-60"
+        >
+          {isPending ? "Redirecionando..." : "Assinar R$ 25/mês"}
+        </button>
+        <button
+          onClick={checkoutYearly}
+          disabled={isPending}
+          className="bg-yellow-500 hover:bg-yellow-400 text-white font-bold text-base px-6 py-3 rounded-xl transition-colors disabled:opacity-60"
+        >
+          {isPending ? "Redirecionando..." : "R$ 250/ano ⭐"}
+        </button>
+      </div>
     </div>
   );
 }

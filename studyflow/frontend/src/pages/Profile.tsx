@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authApi, sessionsApi, subjectsApi } from "../api/client";
 import { useState, useRef } from "react";
+import { useCheckout } from "../hooks/useCheckout";
 
 const STUDY_AREAS = [
   "Concursos Públicos",
@@ -35,6 +36,7 @@ const STUDY_AREAS = [
 
 export default function ProfilePage() {
   const { user, setUser, freeActions } = useAuthStore();
+  const { checkoutMonthly, checkoutYearly, isPending: checkoutPending } = useCheckout();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -472,12 +474,22 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => navigate("/pagamentos")}
-                  className="w-full py-3 rounded-xl font-bold text-sm text-primary-700 bg-white hover:bg-blue-50 transition-colors shadow-lg"
-                >
-                  Assinar agora — economize 87% no plano anual
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={checkoutMonthly}
+                    disabled={checkoutPending}
+                    className="flex-1 py-3 rounded-xl font-bold text-sm text-primary-700 bg-white hover:bg-blue-50 transition-colors shadow-lg disabled:opacity-60"
+                  >
+                    {checkoutPending ? "Redirecionando..." : "R$ 25/mês"}
+                  </button>
+                  <button
+                    onClick={checkoutYearly}
+                    disabled={checkoutPending}
+                    className="flex-1 py-3 rounded-xl font-bold text-sm text-white bg-yellow-500 hover:bg-yellow-400 transition-colors shadow-lg disabled:opacity-60"
+                  >
+                    {checkoutPending ? "Redirecionando..." : "R$ 250/ano ⭐"}
+                  </button>
+                </div>
               </div>
             </div>
           </>
