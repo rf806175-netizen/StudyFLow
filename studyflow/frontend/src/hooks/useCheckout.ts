@@ -4,7 +4,7 @@ import { paymentsApi } from "../api/client";
 export function useCheckout() {
   const { data: prices } = useQuery({
     queryKey: ["payments", "prices"],
-    queryFn: paymentsApi.getPrices,
+    queryFn: paymentsApi.prices,
     staleTime: 1000 * 60 * 10,
   });
 
