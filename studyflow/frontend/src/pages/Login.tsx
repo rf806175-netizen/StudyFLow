@@ -192,7 +192,7 @@ export default function Login() {
 
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Bem-vindo de volta</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Bem-vindo ao StudyFlow</h2>
             <p className="text-gray-400 mt-1 text-sm">
               Entre na plataforma para continuar estudando
             </p>
