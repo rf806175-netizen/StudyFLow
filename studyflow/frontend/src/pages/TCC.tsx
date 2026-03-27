@@ -29,6 +29,8 @@ interface Slide {
   title: string;
   notes: string;
   duration: number; // target seconds
+  fileName?: string;
+  fileUrl?: string;
 }
 
 export default function TCCPage() {
@@ -76,6 +78,23 @@ export default function TCCPage() {
 
   const updateSlide = (id: string, field: keyof Slide, value: string | number) => {
     setSlides((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+  };
+
+  const handleFileUpload = (id: string, file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const fileUrl = e.target?.result as string;
+      setSlides((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, fileName: file.name, fileUrl } : s))
+      );
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = (id: string) => {
+    setSlides((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, fileName: undefined, fileUrl: undefined } : s))
+    );
   };
 
   const startPresentation = () => {
@@ -166,6 +185,20 @@ export default function TCCPage() {
             </div>
           </div>
 
+          {slide.fileUrl && slide.fileUrl.startsWith("data:image") && (
+            <div className="bg-white rounded-xl p-3 mb-4 border border-primary-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Arquivo do slide</p>
+              <img src={slide.fileUrl} alt={slide.fileName} className="max-h-48 rounded-lg object-contain mx-auto" />
+            </div>
+          )}
+          {slide.fileName && !slide.fileUrl?.startsWith("data:image") && (
+            <div className="bg-white rounded-xl p-3 mb-4 border border-primary-100 flex items-center gap-2">
+              <svg className="w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              <span className="text-xs text-primary-700 font-medium">{slide.fileName}</span>
+            </div>
+          )}
           {slide.notes && (
             <div className="bg-white rounded-xl p-4 mb-4 border border-primary-100">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Anotações deste slide</p>
@@ -336,6 +369,42 @@ export default function TCCPage() {
                       value={slide.notes}
                       onChange={(e) => updateSlide(slide.id, "notes", e.target.value)}
                     />
+
+                    {/* Upload de arquivo */}
+                    <div className="mt-2">
+                      {slide.fileName ? (
+                        <div className="flex items-center gap-2 bg-primary-50 border border-primary-100 rounded-lg px-3 py-2">
+                          <svg className="w-4 h-4 text-primary-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          <span className="text-xs text-primary-700 font-medium flex-1 truncate">{slide.fileName}</span>
+                          <button
+                            onClick={() => removeFile(slide.id)}
+                            className="text-gray-400 hover:text-red-400 transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-primary-600 cursor-pointer transition-colors">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          Anexar arquivo (PDF, imagem...)
+                          <input
+                            type="file"
+                            accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx,.doc,.docx"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFileUpload(slide.id, file);
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
